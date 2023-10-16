@@ -1,23 +1,27 @@
-import connection from "../db/connection";
+import { connect } from "../db/connection";
+import * as sql from "mssql";
 import User from "../models/user.model";
-import { ResultSetHeader, RowDataPacket } from "mysql2";
 
 interface ILoginRepository {
-  login(user: User): Promise<number>;
+  login(user: User): Promise<sql.IProcedureResult<string>>;
 }
 
 class LoginRepository implements ILoginRepository {
-  login(user: User): Promise<number> {
-    return new Promise((resolve, reject) => {
-      connection.execute<RowDataPacket[]>(
-        "login.user_login @username=?,@password=?",
-        [user.username, user.password],
-        (err, res) => {
-          if (err) reject(err);
-          else resolve(parseInt(res[0].toString()));
-        }
-      );
-    });
+  async login(user: User): Promise<sql.IProcedureResult<string>> {
+    var pool = new sql.ConnectionPool("");
+    await connect(user.username, user.password)
+      .then((poolRes: sql.ConnectionPool) => {
+        pool = poolRes;
+      })
+      .catch((err) => {
+        throw err;
+      });
+    return pool
+      .request()
+      .input("username", sql.NVarChar(256), user.username)
+      .input("input_password", sql.NVarChar(256), user.password)
+      .output("output", sql.NVarChar(256))
+      .execute<string>("login.user_login");
   }
 }
 

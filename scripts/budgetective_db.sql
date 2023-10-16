@@ -211,7 +211,8 @@ GO
 
 CREATE PROCEDURE LOGIN.user_login (
 	@username NVARCHAR(256),
-	@input_password NVARCHAR(256)
+	@input_password NVARCHAR(256),
+	@output NVARCHAR(256) OUTPUT
 	)
 AS
 BEGIN
@@ -222,19 +223,13 @@ BEGIN
 	WHERE username = @username
 
 	IF (@user_password = @input_password)
-	BEGIN
-		SELECT '1'
-	END
-	ELSE
-	BEGIN
-		SELECT '0'
-	END
+		SELECT @output = @user_password
 END
 GO
 
 GRANT EXECUTE
 	ON LOGIN.user_login
-	TO anon
+	TO db_user
 GO
 
 

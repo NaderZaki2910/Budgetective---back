@@ -5,4 +5,5 @@ exports.default = {
     DB: "budgetective",
     USER: "registration_user",
     PASSWORD: "123456",
+    PORT: "1433",
 };

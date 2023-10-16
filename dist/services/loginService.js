@@ -31,32 +31,32 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var _a;
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.connect = void 0;
-const sql = __importStar(require("mssql"));
-const dotenv = __importStar(require("dotenv"));
-dotenv.config();
-const con = {
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    server: (_a = process.env.DB_HOST) !== null && _a !== void 0 ? _a : "",
-    port: Number(process.env.DB_PORT),
-    options: {
-        trustServerCertificate: true,
-    },
-    pool: {
-        max: 10,
-        min: 0,
-        idleTimeoutMillis: 1500000,
-    },
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-const connect = (username, password) => __awaiter(void 0, void 0, void 0, function* () {
-    if (!!username && !!password) {
-        con.user = username;
-        con.password = password;
+Object.defineProperty(exports, "__esModule", { value: true });
+const loginRepo_1 = __importDefault(require("../repositories/loginRepo"));
+const _jsonwebtoken = __importStar(require("jsonwebtoken"));
+const SECRET_KEY = "WHATAMIDOINGHERE";
+class LoginService {
+    login(user) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var output = "";
+            var token = "";
+            yield loginRepo_1.default
+                .login(user)
+                .then((result) => {
+                output = result.output["output"];
+            })
+                .catch((err) => {
+                throw err;
+            });
+            if (output == user.password)
+                token = _jsonwebtoken.sign({ username: user.username }, SECRET_KEY, {
+                    expiresIn: "2 days",
+                });
+            return { user: user.username, token: token };
+        });
     }
-    return yield sql.connect(con);
-});
-exports.connect = connect;
+}
+exports.default = new LoginService();

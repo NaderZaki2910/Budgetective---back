@@ -1,19 +1,34 @@
 import { Router } from "express";
-import mysql from "mysql2";
-import dbConfig from "../config/db.config";
-import loginRepo from "../repositories/loginRepo";
+import loginService from "../services/loginService";
 import User from "../models/user.model";
+import { Md5 } from "ts-md5";
 
 export const loginRoute = Router();
 
-loginRoute.post("/login", (req, res) => {
-  console.log(req.body);
-  var username: string = req.body.username;
-  var password: string = req.body.password;
+const saltRounds = 8;
+
+loginRoute.post("/login", async (req, res) => {
   const user: User = {
-    username: username,
-    password: password,
+    username: req.body.username,
+    password: await Md5.hashStr(req.body.password),
   };
-  loginRepo.login(user);
-  res.send(`username:${username}, password:${password}`);
+  try {
+    var token;
+    await loginService
+      .login(user)
+      .then((result) => {
+        token = result ?? 0;
+      })
+      .catch((err) => {
+        throw err;
+      });
+    if (!!token) {
+      res.send(token);
+    } else {
+      throw new Error("Login Failed");
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(401).send(err);
+  }
 });
