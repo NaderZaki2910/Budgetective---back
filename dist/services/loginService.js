@@ -53,7 +53,7 @@ class LoginService {
             });
             if (output == user.password)
                 token = _jsonwebtoken.sign({ username: user.username }, SECRET_KEY, {
-                    expiresIn: "2 days",
+                    expiresIn: "1h",
                 });
             return { user: user.username, token: token };
         });
