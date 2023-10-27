@@ -34,42 +34,45 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.connectWithToken = exports.connect = void 0;
+const connection_1 = require("../db/connection");
 const sql = __importStar(require("mssql"));
-const dotenv = __importStar(require("dotenv"));
 const tokenService_1 = __importDefault(require("../services/tokenService"));
-dotenv.config();
-const con = {
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    server: (_a = process.env.DB_HOST) !== null && _a !== void 0 ? _a : "",
-    port: Number(process.env.DB_PORT),
-    options: {
-        trustServerCertificate: true,
-    },
-    pool: {
-        max: 10,
-        min: 0,
-        idleTimeoutMillis: 1500000,
-    },
-};
-const connect = (username, password) => __awaiter(void 0, void 0, void 0, function* () {
-    if (!!username && !!password) {
-        con.user = username;
-        con.password = password;
+class WalletRepository {
+    getWallets(token) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var pool = new sql.ConnectionPool("");
+            yield (0, connection_1.connectWithToken)(token)
+                .then((poolRes) => {
+                pool = poolRes;
+            })
+                .catch((err) => {
+                console.log(err);
+                throw err;
+            });
+            return pool.request().execute("budg.get_user_wallets");
+        });
     }
-    return yield sql.connect(con);
-});
-exports.connect = connect;
-const connectWithToken = (token) => __awaiter(void 0, void 0, void 0, function* () {
-    var decodedToken = tokenService_1.default.decode(token.split(" ")[1]);
-    if (!!token) {
-        con.user = decodedToken.username;
-        con.password = decodedToken.password;
+    addWallet(wallet, token) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var decodedToken = tokenService_1.default.decode(token.split(" ")[1]);
+            var pool = new sql.ConnectionPool("");
+            yield (0, connection_1.connectWithToken)(token)
+                .then((poolRes) => {
+                pool = poolRes;
+            })
+                .catch((err) => {
+                console.log(err);
+                throw err;
+            });
+            return pool
+                .request()
+                .input("name", sql.NVarChar(500), wallet.name)
+                .input("description", sql.NVarChar(3000), wallet.description)
+                .input("amount", sql.Money, wallet.amount)
+                .output("output", sql.Int)
+                .execute("budg.add_wallet");
+        });
     }
-    return yield sql.connect(con);
-});
-exports.connectWithToken = connectWithToken;
+}
+exports.default = new WalletRepository();

@@ -15,17 +15,11 @@ const allowedOrigins = [frontendUrl];
 const options = {
     origin: allowedOrigins,
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-    allowedHeaders: "Content-Type",
+    allowedHeaders: "Content-Type, authorization",
 };
 app.use((0, cors_1.default)(options));
 app.use(express_1.default.json());
 app.use("/api", routes_1.routes);
-app.use((req, res, next) => {
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-    next();
-});
 app.listen(port, () => {
     console.log(`⚡️[server]: Server is running at http://localhost:${port}`);
 });

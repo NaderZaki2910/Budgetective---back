@@ -1,6 +1,6 @@
 import { Router } from "express";
 import loginService from "../services/loginService";
-import User from "../models/user.model";
+import { User } from "../models/user.model";
 import { Md5 } from "ts-md5";
 
 export const loginRoute = Router();
@@ -17,7 +17,7 @@ loginRoute.post("/login", async (req, res) => {
     await loginService
       .login(user)
       .then((result) => {
-        token = result ?? 0;
+        token = result ?? "0";
       })
       .catch((err) => {
         throw err;

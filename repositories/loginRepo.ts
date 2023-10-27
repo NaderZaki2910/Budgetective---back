@@ -1,6 +1,6 @@
 import { connect } from "../db/connection";
 import * as sql from "mssql";
-import User from "../models/user.model";
+import { User } from "../models/user.model";
 
 interface ILoginRepository {
   login(user: User): Promise<sql.IProcedureResult<string>>;

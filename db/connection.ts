@@ -1,5 +1,6 @@
 import * as sql from "mssql";
 import * as dotenv from "dotenv";
+import tokenService from "../services/tokenService";
 
 dotenv.config();
 
@@ -19,7 +20,7 @@ const con: sql.config = {
   },
 };
 
-export const connect = async (
+const connect = async (
   username: string,
   password: string
 ): Promise<sql.ConnectionPool> => {
@@ -29,3 +30,14 @@ export const connect = async (
   }
   return await sql.connect(con);
 };
+
+const connectWithToken = async (token: string): Promise<sql.ConnectionPool> => {
+  var decodedToken = tokenService.decode(token.split(" ")[1]);
+  if (!!token) {
+    con.user = decodedToken.username;
+    con.password = decodedToken.password;
+  }
+  return await sql.connect(con);
+};
+
+export { connect, connectWithToken };

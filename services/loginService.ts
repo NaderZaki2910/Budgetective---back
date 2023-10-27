@@ -1,6 +1,7 @@
 import * as sql from "mssql";
-import User from "../models/user.model";
+import { User } from "../models/user.model";
 import loginRepo from "../repositories/loginRepo";
+import tokenService from "./tokenService";
 import { resolve } from "path";
 import * as _jsonwebtoken from "jsonwebtoken";
 
@@ -22,10 +23,7 @@ class LoginService implements ILoginService {
       .catch((err) => {
         throw err;
       });
-    if (output == user.password)
-      token = _jsonwebtoken.sign({ username: user.username }, SECRET_KEY, {
-        expiresIn: "1h",
-      });
+    if (output == user.password) token = tokenService.encode(user);
     return { user: user.username, token: token };
   }
 }

@@ -13,19 +13,12 @@ const allowedOrigins = [frontendUrl];
 const options: cors.CorsOptions = {
   origin: allowedOrigins,
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-  allowedHeaders: "Content-Type",
+  allowedHeaders: "Content-Type, authorization",
 };
 
 app.use(cors(options));
 app.use(express.json());
 app.use("/api", routes);
-
-app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-  next();
-});
 
 app.listen(port, () => {
   console.log(`⚡️[server]: Server is running at http://localhost:${port}`);
