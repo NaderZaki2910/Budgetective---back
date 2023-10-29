@@ -89,3 +89,31 @@ exports.walletRoute.get("/getWallets", (req, res) => __awaiter(void 0, void 0, v
         }
     }
 }));
+exports.walletRoute.get("/getWalletsStats", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!req.headers.authorization) {
+        res.status(401).send();
+    }
+    else {
+        const token = req.headers.authorization;
+        try {
+            yield walletService_1.default
+                .getWalletsStats(token)
+                .then((result) => {
+                if (!result) {
+                    throw new Error("Failed to get wallet");
+                }
+                else {
+                    console.log(result);
+                    res.send(result);
+                }
+            })
+                .catch((err) => {
+                throw err;
+            });
+        }
+        catch (err) {
+            console.log(err);
+            res.status(400).send({ result: true, err: err });
+        }
+    }
+}));

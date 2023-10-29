@@ -1,7 +1,7 @@
 import { connectWithToken } from "../db/connection";
 import * as sql from "mssql";
 import { User } from "../models/user.model";
-import Wallet from "../models/wallet.model";
+import { Wallet } from "../models/wallet.model";
 import * as _jsonwebtoken from "jsonwebtoken";
 import tokenService from "../services/tokenService";
 

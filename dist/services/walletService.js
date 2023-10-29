@@ -50,5 +50,56 @@ class WalletService {
             }));
         });
     }
+    getWalletsStats(token) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
+                var wallets = [];
+                var walletStats = [];
+                yield walletRepo_1.default.getWallets(token).then((result) => {
+                    wallets = result.recordset;
+                    var walletsInDebt = [];
+                    var walletsNotInDebt = [];
+                    var totOwned = 0;
+                    var totOwed = 0;
+                    var walletStatsInDebt = [];
+                    var walletStatsNotInDebt = [];
+                    wallets.map(function (val, index) {
+                        if (val.amount >= 0) {
+                            totOwned += val.amount;
+                            walletsNotInDebt = walletsNotInDebt.concat(val);
+                        }
+                        else {
+                            totOwed += val.amount;
+                            walletsInDebt = walletsInDebt.concat(val);
+                        }
+                    });
+                    walletsNotInDebt.map(function (val, index) {
+                        if (!!val.id) {
+                            walletStatsNotInDebt = walletStatsNotInDebt.concat({
+                                id: val.id,
+                                name: val.name,
+                                percentage: val.amount / totOwned,
+                            });
+                        }
+                    });
+                    walletsInDebt.map(function (val, index) {
+                        if (!!val.id) {
+                            walletStatsInDebt = walletStatsInDebt.concat({
+                                id: val.id,
+                                name: val.name,
+                                percentage: val.amount / totOwed,
+                            });
+                        }
+                    });
+                    resolve({
+                        walletsInDebt: walletStatsInDebt,
+                        walletsNotInDebt: walletStatsNotInDebt,
+                        totalOwed: totOwed,
+                        totalOwned: totOwned,
+                    });
+                });
+            }));
+        });
+    }
 }
 exports.default = new WalletService();

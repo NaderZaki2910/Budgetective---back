@@ -1,6 +1,6 @@
 import { Router } from "express";
 import walletService from "../services/walletService";
-import Wallet from "../models/wallet.model";
+import { Wallet } from "../models/wallet.model";
 
 export const walletRoute = Router();
 
@@ -70,6 +70,32 @@ walletRoute.get("/getWallets", async (req, res) => {
       }
     } else {
       res.status(400).send(new Error("Wrong Parameters"));
+    }
+  }
+});
+
+walletRoute.get("/getWalletsStats", async (req, res) => {
+  if (!req.headers.authorization) {
+    res.status(401).send();
+  } else {
+    const token = req.headers.authorization;
+    try {
+      await walletService
+        .getWalletsStats(token)
+        .then((result) => {
+          if (!result) {
+            throw new Error("Failed to get wallet");
+          } else {
+            console.log(result);
+            res.send(result);
+          }
+        })
+        .catch((err) => {
+          throw err;
+        });
+    } catch (err) {
+      console.log(err);
+      res.status(400).send({ result: true, err: err });
     }
   }
 });
