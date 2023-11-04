@@ -14,7 +14,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const loginRepo_1 = __importDefault(require("../repositories/loginRepo"));
 const tokenService_1 = __importDefault(require("./tokenService"));
-const SECRET_KEY = "WHATAMIDOINGHERE";
 class LoginService {
     login(user) {
         return __awaiter(this, void 0, void 0, function* () {

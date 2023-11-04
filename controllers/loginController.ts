@@ -14,14 +14,9 @@ loginRoute.post("/login", async (req, res) => {
   };
   try {
     var token;
-    await loginService
-      .login(user)
-      .then((result) => {
-        token = result ?? "0";
-      })
-      .catch((err) => {
-        throw err;
-      });
+    await loginService.login(user).then((result) => {
+      token = result ?? "0";
+    });
     if (!!token) {
       res.send(token);
     } else {

@@ -12,29 +12,29 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.walletRoute = void 0;
+exports.categoryRoute = void 0;
 const express_1 = require("express");
-const walletService_1 = __importDefault(require("../services/walletService"));
-exports.walletRoute = (0, express_1.Router)();
-exports.walletRoute.post("/addWallet", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const categoryService_1 = __importDefault(require("../services/categoryService"));
+exports.categoryRoute = (0, express_1.Router)();
+exports.categoryRoute.post("/addCategory", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     if (!req.headers.authorization) {
         res.status(401).send();
     }
     else {
-        const wallet = {
+        console.log(req.body);
+        const category = {
             name: req.body.name,
-            description: req.body.description,
-            amount: req.body.amount,
+            child_of: req.body.child_of,
         };
         const token = req.headers.authorization;
         try {
             var result;
-            yield walletService_1.default
-                .addWallet(wallet, token)
+            yield categoryService_1.default
+                .addCategory(category, token)
                 .then((result) => {
                 console.log(result.output["output"]);
                 if (!result.output["output"] || result.output["output"] == 0) {
-                    throw new Error("Failed to add wallet");
+                    throw new Error("Failed to add category");
                 }
                 else {
                     res.send({ result: true });
@@ -50,7 +50,7 @@ exports.walletRoute.post("/addWallet", (req, res) => __awaiter(void 0, void 0, v
         }
     }
 }));
-exports.walletRoute.get("/getWallets", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.categoryRoute.get("/getCategories", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     if (!req.headers.authorization) {
         res.status(401).send();
     }
@@ -59,24 +59,27 @@ exports.walletRoute.get("/getWallets", (req, res) => __awaiter(void 0, void 0, v
         const { query } = req;
         const page = query.page;
         const pageSize = query.pageSize;
+        const getRoot = query.getRoot;
+        const parentId = query.parentId;
         if (!!page &&
             !!pageSize &&
+            !!getRoot &&
             typeof page === "string" &&
-            typeof pageSize === "string") {
+            typeof pageSize === "string" &&
+            typeof getRoot === "string") {
             try {
-                yield walletService_1.default
-                    .getWallets(token, parseInt(page), parseInt(pageSize))
+                console.log(parentId);
+                yield categoryService_1.default
+                    .getCategories(token, parseInt(page), parseInt(pageSize), getRoot == "true", !!parentId && typeof parentId === "string"
+                    ? parseInt(parentId)
+                    : undefined)
                     .then((result) => {
                     if (!result) {
-                        throw new Error("Failed to get wallet");
+                        throw new Error("Failed to get category");
                     }
                     else {
-                        console.log(result, "after paging");
                         res.send(result);
                     }
-                })
-                    .catch((err) => {
-                    throw err;
                 });
             }
             catch (err) {
@@ -86,29 +89,6 @@ exports.walletRoute.get("/getWallets", (req, res) => __awaiter(void 0, void 0, v
         }
         else {
             res.status(400).send(new Error("Wrong Parameters"));
-        }
-    }
-}));
-exports.walletRoute.get("/getWalletsStats", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    if (!req.headers.authorization) {
-        res.status(401).send();
-    }
-    else {
-        const token = req.headers.authorization;
-        try {
-            yield walletService_1.default.getWalletsStats(token).then((result) => {
-                if (!result) {
-                    throw new Error("Failed to get wallet");
-                }
-                else {
-                    console.log(result);
-                    res.send(result);
-                }
-            });
-        }
-        catch (err) {
-            console.log(err);
-            res.status(400).send({ result: true, err: err });
         }
     }
 }));

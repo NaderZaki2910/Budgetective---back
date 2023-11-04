@@ -25,13 +25,8 @@ exports.loginRoute.post("/login", (req, res) => __awaiter(void 0, void 0, void 0
     };
     try {
         var token;
-        yield loginService_1.default
-            .login(user)
-            .then((result) => {
+        yield loginService_1.default.login(user).then((result) => {
             token = result !== null && result !== void 0 ? result : "0";
-        })
-            .catch((err) => {
-            throw err;
         });
         if (!!token) {
             res.send(token);

@@ -1,7 +1,4 @@
-import * as sql from "mssql";
 import { User, Token } from "../models/user.model";
-import loginRepo from "../repositories/loginRepo";
-import { resolve } from "path";
 import * as _jsonwebtoken from "jsonwebtoken";
 import * as CryptoJS from "crypto-js";
 
@@ -23,7 +20,9 @@ class TokenService implements ITokenService {
         iv: IV,
       }
     ).toString();
-    return _jsonwebtoken.sign({ ciphertext: ciphertext }, SECRET_KEY);
+    return _jsonwebtoken.sign({ ciphertext: ciphertext }, SECRET_KEY, {
+      // expiresIn: "1",
+    });
   }
   decode(token: string): any {
     var decoded = _jsonwebtoken.verify(token, SECRET_KEY);

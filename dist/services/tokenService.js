@@ -36,7 +36,9 @@ class TokenService {
         let ciphertext = CryptoJS.AES.encrypt(JSON.stringify(user), ENCRYPTION_KEY, {
             iv: IV,
         }).toString();
-        return _jsonwebtoken.sign({ ciphertext: ciphertext }, SECRET_KEY);
+        return _jsonwebtoken.sign({ ciphertext: ciphertext }, SECRET_KEY, {
+        // expiresIn: "1",
+        });
     }
     decode(token) {
         var decoded = _jsonwebtoken.verify(token, SECRET_KEY);

@@ -80,19 +80,14 @@ walletRoute.get("/getWalletsStats", async (req, res) => {
   } else {
     const token = req.headers.authorization;
     try {
-      await walletService
-        .getWalletsStats(token)
-        .then((result) => {
-          if (!result) {
-            throw new Error("Failed to get wallet");
-          } else {
-            console.log(result);
-            res.send(result);
-          }
-        })
-        .catch((err) => {
-          throw err;
-        });
+      await walletService.getWalletsStats(token).then((result) => {
+        if (!result) {
+          throw new Error("Failed to get wallet");
+        } else {
+          console.log(result);
+          res.send(result);
+        }
+      });
     } catch (err) {
       console.log(err);
       res.status(400).send({ result: true, err: err });

@@ -1,11 +1,6 @@
-import * as sql from "mssql";
 import { User } from "../models/user.model";
 import loginRepo from "../repositories/loginRepo";
 import tokenService from "./tokenService";
-import { resolve } from "path";
-import * as _jsonwebtoken from "jsonwebtoken";
-
-const SECRET_KEY = "WHATAMIDOINGHERE";
 
 interface ILoginService {
   login(user: User): Promise<number>;

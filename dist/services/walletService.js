@@ -13,7 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const walletRepo_1 = __importDefault(require("../repositories/walletRepo"));
-const SECRET_KEY = "WHATAMIDOINGHERE";
+const pagingService_1 = __importDefault(require("./pagingService"));
 class WalletService {
     addWallet(wallet, token) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -24,29 +24,17 @@ class WalletService {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
                 var wallets = [];
-                yield walletRepo_1.default.getWallets(token).then((result) => {
+                yield walletRepo_1.default.getWallets(token).then((result) => __awaiter(this, void 0, void 0, function* () {
                     wallets = result.recordset;
-                    var totalItems = wallets.length;
-                    console.log(page, pageSize, "parameters");
-                    console.log(wallets, "before paging");
-                    var totalPages = Math.ceil(wallets.length / pageSize);
-                    console.log(totalPages, "totalPages");
-                    if (totalPages == page && totalPages != 1) {
-                        var totElementsNotNeeded = (totalPages - 1) * pageSize;
-                        console.log(totElementsNotNeeded, "totElementsNotNeeded");
-                        wallets = wallets.splice(totElementsNotNeeded, wallets.length - totElementsNotNeeded);
-                    }
-                    else {
-                        if (page == 1) {
-                            wallets = wallets.splice(0, pageSize);
-                        }
-                        else {
-                            var totElementsNotNeeded = (page - 1) * pageSize;
-                            wallets = wallets.splice(totElementsNotNeeded, pageSize);
-                        }
-                    }
-                    resolve({ wallets: wallets, totalItems: totalItems });
-                });
+                    yield pagingService_1.default
+                        .pageArray(wallets, page, pageSize)
+                        .then((pagedResult) => {
+                        resolve({
+                            wallets: pagedResult.pagedArray,
+                            totalItems: pagedResult.totalItems,
+                        });
+                    });
+                }));
             }));
         });
     }
@@ -57,12 +45,9 @@ class WalletService {
                 var walletStats = [];
                 yield walletRepo_1.default.getWallets(token).then((result) => {
                     wallets = result.recordset;
-                    var walletsInDebt = [];
-                    var walletsNotInDebt = [];
-                    var totOwned = 0;
-                    var totOwed = 0;
-                    var walletStatsInDebt = [];
-                    var walletStatsNotInDebt = [];
+                    var walletsInDebt = [], walletsNotInDebt = [];
+                    var totOwned = 0, totOwed = 0;
+                    var walletStatsInDebt = [], walletStatsNotInDebt = [];
                     wallets.map(function (val, index) {
                         if (val.amount >= 0) {
                             totOwned += val.amount;
